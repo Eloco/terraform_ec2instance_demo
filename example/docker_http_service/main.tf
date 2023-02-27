@@ -5,7 +5,7 @@ resource "aws_instance" "demo_ec2" {
 
   depends_on = [
     aws_vpc.demo_vpc,
-    aw_subnet.public_subnet,
+    aws_subnet.public_subnet,
     aws_subnet.private_subnet,
     aws_security_group.normal_rule,
   ]

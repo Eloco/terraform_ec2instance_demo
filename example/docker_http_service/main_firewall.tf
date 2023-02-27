@@ -7,7 +7,7 @@ resource "aws_security_group" "normal_rule" {
     aws_subnet.private_subnet
   ]
 
-  description = "HTTP, PING, SSH"
+  description = "HTTPS, HTTP, PING, SSH"
 
   # Name of the security Group!
   name = "normal_port_enable"
@@ -22,6 +22,15 @@ resource "aws_security_group" "normal_rule" {
     to_port     = 80
 
     # Here adding tcp instead of http, because http in part of tcp only!
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Created an inbound rule for https!
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

@@ -40,13 +40,14 @@ resource "aws_instance" "demo_ec2" {
   }
   # associate_public_ip_address = true
 
+  # user_data = file("file.sh")
   user_data = <<-EOF
-                #!/bin/bash
-                sudo yum update -y
-                sudo amazon-linux-extras install docker
-                sudo service docker start
-                sudo usermod -a -G docker ec2-user
-                EOF
+              #!/bin/bash
+              sudo yum update -y
+              sudo amazon-linux-extras install docker
+              sudo service docker start
+              sudo usermod -a -G docker ec2-user
+              EOF
 
   #provisioner "file" {
   #  source = "my-image.tar.gz"

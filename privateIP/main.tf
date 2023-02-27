@@ -25,7 +25,7 @@ data "aws_ami" "amazon-linux-2" {
 resource "aws_instance" "private_ec2_demo" {
   depends_on = [
       aws_subnet.private_subnet,
-      aws_security_group.normal_rule_1,
+      aws_security_group.demo_rule,
       aws_network_interface.private_ip
   ]
   # ami          = "ami-0c55b159cbfafe1f0"
@@ -34,19 +34,18 @@ resource "aws_instance" "private_ec2_demo" {
   key_name      = "my-key-pair"
   count         = 1
   # "network_interface": conflicts with vpc_security_group_ids
-  #vpc_security_group_ids = ["$(aws_security_group.private_subnet.id)"]
+  # vpc_security_group_ids = ["$(aws_security_group.private_subnet.id)"]
 
-  network_interface {
-    network_interface_id = aws_network_interface.private_ip.id
-    #security_groups = ["${aws_security_group.normal_rule_1.id}"]
-    device_index         = 0
-  }
   tags = {
         Name          = "private_ec2_demo"
         Terraform     = "true"
         Environment   = "dev"
         # Environment   = "production"
-    }
+  }
+  network_interface {
+    network_interface_id = aws_network_interface.private_ip.id
+    device_index = 0
+  }
 }
 
 resource "aws_vpc" "private_vpc" {
@@ -60,22 +59,24 @@ resource "aws_vpc" "private_vpc" {
 
 resource "aws_subnet" "private_subnet" {
   depends_on = [
-    aws_vpc.private_vpc
+    aws_vpc.private_vpc,
   ]
-  vpc_id            = "${aws_vpc.private_vpc.id}"
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"
+  # VPC in which subnet has to be created!
+  vpc_id = aws_vpc.private_vpc.id
+  # IP Range of this subnet
+  cidr_block = "10.0.1.0/24"
+  # Data Center of this subnet.
+  availability_zone = "us-east-1c"
+  tags = {
+    Name = "Private Subnet 1"
+  }
 }
 
-
-resource "aws_security_group" "normal_rule_1" {
-  depends_on = [
-    aws_vpc.private_vpc,
-    aws_subnet.private_subnet
-  ]
+resource "aws_security_group" "demo_rule" {
 
   description = "HTTP, PING, SSH"
-  name = "normal_port_enable"
+  name = "demo_rule"
+  vpc_id      = aws_vpc.private_vpc.id
 
   # Created an inbound rule for ping
   ingress {
@@ -114,7 +115,10 @@ resource "aws_network_interface" "private_ip" {
   private_ips = [
     "10.0.1.10"  # replace as your private ip
   ]
-  #security_groups = [
-  #    "${aws_security_group.normal_rule_1.id}"
-  #  ]
+
+  security_groups = [aws_security_group.demo_rule.id]
+
+  tags = {
+    Name = "primary_network_interface"
+  }
 }

@@ -13,8 +13,7 @@ terraform_ec2instance_demo
     --query "KeyMaterial" \
     --output text > my-key-pair.pem
 ```
-3. modify terraform.tfvars.bak and unbak it.
-4. `terraform apply` and review
-5. `ssh -i "my-key-pair.pem" ec2-user@{public ip}`
+3. `terraform apply` and review
+4. `ssh -i "my-key-pair.pem" ec2-user@{public ip}`
 
 see more at https://asciinema.org/a/tj58mIKF3SkNw4RIBjuyqWZ5V
